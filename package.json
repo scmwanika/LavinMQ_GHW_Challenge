@@ -1,5 +1,6 @@
 {
   "name": "lavinmq_ghw_challenge",
+  "type": "module",
   "version": "1.0.0",
   "author": "Stephen Crispin Mwanika",
   "dependencies": {
