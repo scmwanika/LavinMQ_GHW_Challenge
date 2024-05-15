@@ -25,42 +25,15 @@ async function startProducer() {
     );
     await channel.queueBind("support_queue", "slack_notifications", "support");
 
-    // Publish a message to queue HR
-    async function sendHR(routingKey, body) {
-      const message = body;
-      const jsonMessage = JSON.stringify(message);
-      // amqp-client function expects: publish(exchange, routingKey, message, options)
-      await queHr.publish("New message in HR", { routingKey }, jsonMessage);
+    // Publish message to queue
+    async function sendMessage() {
+      await queHr.publish("New message in HR");
+      await queMart.publish("New message in Marketing");
+      await queSupp.publish("New message in Support");
     }
 
-    // Publish a message to queue Marketing
-    async function sendMarketing(routingKey, body) {
-      const message = body;
-      const jsonMessage = JSON.stringify(message);
-      // amqp-client function expects: publish(exchange, routingKey, message, options)
-      await queMart.publish(
-        "New message in Marketing",
-        { routingKey },
-        jsonMessage
-      );
-    }
-
-    // Publish a message to queue Support
-    async function sendSupport(routingKey, body) {
-      const message = body;
-      const jsonMessage = JSON.stringify(message);
-      // amqp-client function expects: publish(exchange, routingKey, message, options)
-      await queSupp.publish(
-        "New message in Support",
-        { routingKey },
-        jsonMessage
-      );
-    }
-
-    // Send some messages to the queues
-    sendHR();
-    sendMarketing();
-    sendSupport();
+    // Send message to queue
+    sendMessage();
 
     setTimeout(() => {
       // Close the connection
