@@ -14,32 +14,25 @@ async function startConsumer() {
   const queMart = await channel.queue("marketing_queue");
   const queSupp = await channel.queue("support_queue");
 
-  // Consume a message from HR
-  await queHr.subscribe({ noAck: false }, async (msg) => {
+  // Subscribe to message
+  async function receiveMessage() {
     try {
-      msg.ack();
-    } catch (error) {
-      console.error(error);
+      await queHr.subscribe({ noAck: false }, async (msg) => {
+        msg.ack();
+      });
+      await queMart.subscribe({ noAck: false }, async (msg) => {
+        msg.ack();
+      });
+      await queSupp.subscribe({ noAck: false }, async (msg) => {
+        msg.ack();
+      });
+    } catch (err) {
+      // error handling
     }
-  });
+  }
 
-  // Consume a message from Marketing
-  await queMart.subscribe({ noAck: false }, async (msg) => {
-    try {
-      msg.ack();
-    } catch (error) {
-      console.error(error);
-    }
-  });
-
-  // Consume a message from Support
-  await queSupp.subscribe({ noAck: false }, async (msg) => {
-    try {
-      msg.ack();
-    } catch (error) {
-      console.error(error);
-    }
-  });
+  // Receive message from queue
+  receiveMessage();
 
   // When the process is terminated, close the connection
   process.on("SIGINT", () => {
@@ -50,4 +43,4 @@ async function startConsumer() {
   });
 }
 // Start services
-startConsumer().catch(console.error);
+startConsumer();
